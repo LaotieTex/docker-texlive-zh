@@ -80,6 +80,10 @@ Create a dev container configuration file `.devcontainer.json` in the root of yo
 Document of the [VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers)<br>
 [VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) 官方文档
 
+## Source Code / 镜像源码
+
+https://github.com/LaotieTex/docker-texlive-zh
+
 ## License / 许可证
 
 MIT (c) 3846masa
