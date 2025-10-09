@@ -1,6 +1,6 @@
 FROM paperist/texlive-ja:latest
 
-RUN sed -i 's/deb.debian.org/mirrors.163.com/g' /etc/apt/sources.list.d/debian.sources
+# RUN sed -i 's/deb.debian.org/mirrors.163.com/g' /etc/apt/sources.list.d/debian.sources
 RUN apt-get update \
   && apt-get install -y \
     libfontconfig \
@@ -15,4 +15,4 @@ RUN apt-get update \
   && apt clean -y \
   && rm -rf /var/lib/apt/lists/*
 
-RUN tlmgr install gbt7714 plantuml
+RUN tlmgr install gbt7714
