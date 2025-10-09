@@ -15,4 +15,4 @@ RUN apt-get update \
   && apt clean -y \
   && rm -rf /var/lib/apt/lists/*
 
-RUN tlmgr install gbt7714
+RUN tlmgr install gbt7714 plantuml
