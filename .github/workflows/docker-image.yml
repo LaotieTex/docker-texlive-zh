@@ -16,8 +16,22 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./texlive-zh/Dockerfile
+            tags: |
+              laotie255/texlive-zh:latest
+              registry.cn-hangzhou.aliyuncs.com/laotie255/texlive-zh:latest
+          - dockerfile: ./texlive-full-zh/Dockerfile
+            tags: |
+              laotie255/texlive-zh:full-latest
+              registry.cn-hangzhou.aliyuncs.com/laotie255/texlive-zh:full-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Login to DockerHub
         uses: docker/login-action@v3 # v3.2.0
         with:
@@ -34,9 +48,8 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v6.3.0
         with:
-          file: ./texlive-zh/Dockerfile
+          context: .
+          file: ${{ matrix.dockerfile }}
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            laotie255/texlive-zh:latest
-            registry.cn-hangzhou.aliyuncs.com/laotie255/texlive-zh:latest
+          tags: ${{ matrix.tags }}
