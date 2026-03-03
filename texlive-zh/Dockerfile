@@ -11,8 +11,14 @@ RUN apt-get update \
     fonts-arphic-ukai \
     fonts-arphic-uming \
     fonts-noto-cjk-extra \
+    wget \
+    ca-certificates \
   && apt autoremove -y \
   && apt clean -y \
   && rm -rf /var/lib/apt/lists/*
 
-RUN tlmgr install gbt7714 pstricks fundus-calligra
+RUN wget http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/tlnet/update-tlmgr-latest.sh \
+  && sh update-tlmgr-latest.sh -- --upgrade \
+  && tlmgr option repository http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/tlnet \
+  && tlmgr update --self --all \
+  && tlmgr install gbt7714 pstricks fundus-calligra
