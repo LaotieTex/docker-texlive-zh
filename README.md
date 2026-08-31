@@ -80,9 +80,11 @@ Create a dev container configuration file `.devcontainer.json` in the root of yo
 Document of the [VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers)<br>
 [VSCode Dev Container](https://code.visualstudio.com/docs/devcontainers/containers) 官方文档
 
-## Diagrams / 图表支持（PlantUML）
+## Diagrams / 图表支持（PlantUML & Mermaid）
 
-镜像内置 PlantUML 支持，可直接在 LaTeX 文档中绘制流程图、时序图、类图等。
+镜像内置 PlantUML 与 Mermaid 支持，可直接在 LaTeX 文档中绘制流程图、时序图、类图、架构图等。
+
+### PlantUML
 
 `plantuml` 宏包只是包装器，镜像已通过 apt 安装 `plantuml`（自带 Java 运行时）与 `graphviz`，
 并设置了 `PLANTUML_JAR` 环境变量指向 `plantuml.jar`，同时用 tlmgr 安装了 `plantuml` 宏包。
@@ -108,8 +110,29 @@ actor 用户
 xelatex -shell-escape main.tex
 ```
 
-> 注：Mermaid 支持未内置。Mermaid 渲染必须依赖无头 Chromium（Puppeteer），会显著增大镜像体积；
-> 如需加入，可后续单独扩展（例如安装 `mermaid-cli` + Chromium 并使用 CTAN 的 `mermaid`/`ltmermaid` 宏包）。
+### Mermaid
+
+`mermaid` 宏包（tlmgr 安装 `ltmermaid`，同时提供 `mermaid.sty` 与 `ltmermaid.sty`）直接驱动 Mermaid CLI（`mmdc`）。
+底层依赖无头 Chromium（Puppeteer），镜像已安装并配置 `--no-sandbox`，无需额外参数。
+
+```latex
+\documentclass{ctexart}
+\usepackage{mermaid}
+\begin{document}
+\begin{mermaid}
+flowchart LR
+  A[开始] --> B[处理] --> C[结束]
+\end{mermaid}
+\end{document}
+```
+
+```bash
+# 命令行编译需加 -shell-escape
+xelatex -shell-escape main.tex
+```
+
+> 若 `mmdc` 不在 PATH，可在导言区指定 `\usepackage[Renderer={npx -y @mermaid-js/mermaid-cli}]{mermaid}`
+> （首次编译会联网下载 mermaid-cli）。
 
 ## Source Code / 镜像源码
 
