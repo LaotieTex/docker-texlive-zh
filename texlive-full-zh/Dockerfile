@@ -40,7 +40,7 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
     PUPPETEER_CONFIG_FILE=/usr/local/etc/puppeteer.config.json
 
 RUN tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet \
-  && tlmgr update --self \
+  && (tlmgr update --self || true) \
   && tlmgr install plantuml ltmermaid
 
 # ENV LANG=zh_CN.UTF-8 \
