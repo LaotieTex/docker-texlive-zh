@@ -3,43 +3,34 @@ FROM paperist/texlive-ja:latest
 # 使用国内 apt 镜像加速（海外构建可注释此行）
 # RUN sed -i 's/deb.debian.org/mirrors.163.com/g' /etc/apt/sources.list.d/debian.sources || true
 
-RUN apt-get update \
-  && apt-get install -y \
-    libfontconfig \
-    fonts-arphic-bkai00mp \
-    fonts-arphic-bsmi00lp \
-    fonts-arphic-gbsn00lp \
-    fonts-arphic-gkai00mp \
-    fonts-arphic-ukai \
-    fonts-arphic-uming \
-    fonts-noto-cjk-extra \
-    wget \
-    ca-certificates \
-  && apt autoremove -y \
-  && apt clean -y \
-  && rm -rf /var/lib/apt/lists/*
-
-# ---- 图表支持：PlantUML ----
-# plantuml 宏包只是包装器，需配合外部 plantuml.jar（由 apt 的 plantuml 包提供，并自动拉取 Java）
+# 单次 apt-get update + install：中文字体 / PlantUML(Java+graphviz) / Mermaid(Node+无头 Chromium)
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
+     libfontconfig \
+     ca-certificates \
+     wget \
+     fonts-arphic-bkai00mp \
+     fonts-arphic-bsmi00lp \
+     fonts-arphic-gbsn00lp \
+     fonts-arphic-gkai00mp \
+     fonts-arphic-ukai \
+     fonts-arphic-uming \
+     fonts-noto-cjk-extra \
      plantuml \
      graphviz \
-  && rm -rf /var/lib/apt/lists/*
-
-ENV PLANTUML_JAR=/usr/share/plantuml/plantuml.jar
-
-# ---- 图表支持：Mermaid ----
-# mermaid 宏包（tlmgr: ltmermaid，提供 mermaid.sty）仅作包装，需 Mermaid CLI(mmdc) + 无头 Chromium
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
      nodejs \
      npm \
      chromium \
      libgbm1 \
      libnss3 \
+  && apt-get autoremove -y \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
+# PlantUML 宏包只是包装器，需配合外部 plantuml.jar（上面 apt 的 plantuml 包已提供，并自动拉取 Java）
+ENV PLANTUML_JAR=/usr/share/plantuml/plantuml.jar
+
+# Mermaid CLI（mmdc）；puppeteer 复用上面的系统 chromium，跳过自带下载
 RUN printf '{\n  "args": ["--no-sandbox", "--disable-setuid-sandbox"]\n}\n' \
       > /usr/local/etc/puppeteer.config.json \
   && npm config set registry https://registry.npmmirror.com \
