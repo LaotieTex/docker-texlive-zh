@@ -1,6 +1,6 @@
 FROM texlive/texlive:latest
 
-RUN sed -i 's/deb.debian.org/mirrors.163.com/g' /etc/apt/sources.list.d/debian.sources
+# RUN sed -i 's/deb.debian.org/mirrors.163.com/g' /etc/apt/sources.list.d/debian.sources
 
 # ---- 图表支持：PlantUML ----
 # plantuml 宏包只是包装器，需配合外部 plantuml.jar（由 apt 的 plantuml 包提供，并自动拉取 Java）
@@ -39,7 +39,7 @@ RUN printf '{\n  "args": ["--no-sandbox", "--disable-setuid-sandbox"]\n}\n' \
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
     PUPPETEER_CONFIG_FILE=/usr/local/etc/puppeteer.config.json
 
-RUN tlmgr option repository https://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/tlnet \
+RUN tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet \
   && tlmgr update --self \
   && tlmgr install plantuml ltmermaid
 

@@ -49,8 +49,8 @@ RUN printf '{\n  "args": ["--no-sandbox", "--disable-setuid-sandbox"]\n}\n' \
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
     PUPPETEER_CONFIG_FILE=/usr/local/etc/puppeteer.config.json
 
-RUN wget http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/tlnet/update-tlmgr-latest.sh \
+RUN wget https://mirror.ctan.org/systems/texlive/tlnet/update-tlmgr-latest.sh \
   && sh update-tlmgr-latest.sh -- --upgrade \
-  && tlmgr option repository http://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/tlnet \
+  && tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet \
   && tlmgr update --self --all \
   && tlmgr install gbt7714 pstricks fundus-calligra plantuml ltmermaid
