@@ -1,0 +1,17 @@
+% 验证 PlantUML 支持
+% 编译: lualatex -shell-escape -interaction=nonstopmode -halt-on-error test-plantuml.tex
+%
+% 注意：plantuml 宏包自 0.7.0 起支持 lualatex 与 pdflatex，但【不支持 xelatex】。
+% 引擎不匹配时宏包不会报错中止，而是输出占位框，因此 verify.sh 会额外检查日志中的降级提示。
+\documentclass{ctexart}
+\usepackage{plantuml}
+\begin{document}
+\section{PlantUML 测试}
+\begin{plantuml}
+@startuml
+actor 用户
+用户 -> 后端: 发起请求
+后端 --> 用户: 返回结果
+@enduml
+\end{plantuml}
+\end{document}

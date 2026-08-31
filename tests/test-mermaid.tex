@@ -1,0 +1,14 @@
+% 验证 Mermaid 支持
+% 编译: xelatex -shell-escape -interaction=nonstopmode -halt-on-error test-mermaid.tex
+%
+% mermaid 宏包（ltmermaid 提供）不依赖 Lua，xelatex / pdflatex / lualatex 均可。
+% 渲染产物会写到 mermaid/ 目录（.mmd 源与 .pdf），verify.sh 会检查该目录。
+\documentclass{ctexart}
+\usepackage{mermaid}
+\begin{document}
+\section{Mermaid 测试}
+\begin{mermaid}
+flowchart LR
+  A[开始] --> B[处理] --> C[结束]
+\end{mermaid}
+\end{document}

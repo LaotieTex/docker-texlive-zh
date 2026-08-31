@@ -37,9 +37,18 @@ RUN printf '{\n  "args": ["--no-sandbox", "--disable-setuid-sandbox"]\n}\n' \
   && PUPPETEER_SKIP_DOWNLOAD=true npm install -g @mermaid-js/mermaid-cli@10.9.1 \
   && npm cache clean --force
 
+# 容器内以 root 运行，chromium 必须 --no-sandbox。
+# Debian 的 /usr/bin/chromium 是 shell 包装脚本，会 source /etc/chromium.d/*，
+# 在这里加标志最可靠（puppeteer 配置文件不一定被 mermaid-cli 读取）。
+RUN printf 'export CHROMIUM_FLAGS="$CHROMIUM_FLAGS --no-sandbox --disable-setuid-sandbox"\n' \
+      > /etc/chromium.d/no-sandbox
+
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
     PUPPETEER_CONFIG_FILE=/usr/local/etc/puppeteer.config.json
 
+# 基础镜像是日文 TeX Live：只有 luatexja/ptex，没有 ctex 宏包也没有 xetex 引擎。
+# 中文文档（ctexart / xelatex）必须补装这两项。
 RUN tlmgr option repository https://mirror.ctan.org/systems/texlive/tlnet \
   && (tlmgr update --self || true) \
-  && tlmgr install gbt7714 pstricks fundus-calligra plantuml ltmermaid
+  # luacode 是 plantuml 宏包的运行时依赖，但 CTAN 未声明，tlmgr 不会自动装，必须显式补上
+  && tlmgr install gbt7714 pstricks fundus-calligra ctex xetex plantuml ltmermaid luacode
