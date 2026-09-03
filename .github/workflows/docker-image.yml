@@ -38,7 +38,7 @@ jobs:
       - name: Generate date tag
         id: date
         # 用北京时间取日期：runner 默认是 UTC，否则凌晨的构建会被标成前一天
-        run: echo "tag=$(TZ=Asia/Shanghai date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+        run: echo "tag=$(TZ=Asia/Shanghai date +'%Y%m%d')" >> "$GITHUB_OUTPUT"
 
       - name: Login to DockerHub
         uses: docker/login-action@v3 # v3.2.0
