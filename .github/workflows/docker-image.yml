@@ -20,18 +20,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # flavor:     滚动标签
+          # date_prefix: 日期标签前缀。两个镜像共用同一个仓库名 laotie255/texlive-zh，
+          #              仅靠 tag 区分，所以 full 镜像的日期标签必须加前缀，
+          #              否则会与常规镜像的日期标签互相覆盖。
           - dockerfile: ./texlive-zh/Dockerfile
-            tags: |
-              laotie255/texlive-zh:latest
-              registry.cn-hangzhou.aliyuncs.com/laotie255/texlive-zh:latest
+            flavor: latest
+            date_prefix: ""
           - dockerfile: ./texlive-full-zh/Dockerfile
-            tags: |
-              laotie255/texlive-zh:full-latest
-              registry.cn-hangzhou.aliyuncs.com/laotie255/texlive-zh:full-latest
+            flavor: full-latest
+            date_prefix: "full-"
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Generate date tag
+        id: date
+        # 用北京时间取日期：runner 默认是 UTC，否则凌晨的构建会被标成前一天
+        run: echo "tag=$(TZ=Asia/Shanghai date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
       - name: Login to DockerHub
         uses: docker/login-action@v3 # v3.2.0
         with:
@@ -52,4 +60,21 @@ jobs:
           file: ${{ matrix.dockerfile }}
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ matrix.tags }}
+          # 关闭 provenance / SBOM 证明（attestation）。
+          # buildx 默认会给推送到 registry 的镜像附一份 provenance 证明，
+          # 结果就是产物不再是一个纯镜像，而是一个 OCI image index，
+          # 里面除了真实镜像还挂了一个 platform=unknown/unknown 的证明清单，
+          # 其 config 媒体类型为 application/vnd.oci.empty.v1+json。
+          # DockerHub 能接受，但阿里云 ACR 不认这个类型，整个 index 会被拒绝：
+          #   denied: unknown manifest class for application/vnd.oci.empty.v1+json
+          # 关掉后产物回到标准 Docker Manifest V2 Schema 2，ACR 可正常接收
+          # （顺带修掉 ACR 控制台把镜像大小显示成 0 的问题）。
+          # sbom 默认不开，这里一并显式写死，防止以后 buildx 改默认值再踩一次。
+          provenance: false
+          sbom: false
+          # 每个镜像打两个标签：latest（滚动更新） + 日期（可回溯快照）
+          tags: |
+            laotie255/texlive-zh:${{ matrix.flavor }}
+            laotie255/texlive-zh:${{ matrix.date_prefix }}${{ steps.date.outputs.tag }}
+            registry.cn-hangzhou.aliyuncs.com/laotie255/texlive-zh:${{ matrix.flavor }}
+            registry.cn-hangzhou.aliyuncs.com/laotie255/texlive-zh:${{ matrix.date_prefix }}${{ steps.date.outputs.tag }}
